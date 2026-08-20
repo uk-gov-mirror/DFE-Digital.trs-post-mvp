@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Design review",
+  "version": "1.0.0",
+  "description": "Add pins and threaded comments on Heroku-hosted apps (herokuapp.com), with optional team sync. Set your name and email in Profile for future notifications.",
+  "permissions": ["storage", "scripting"],
+  "host_permissions": ["https://*.herokuapp.com/*"],
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Design review: open comments / close",
+    "default_icon": {
+      "16": "icon16.png",
+      "32": "icon32.png",
+      "48": "icon48.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.herokuapp.com/*"],
+      "js": ["config.js", "content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}

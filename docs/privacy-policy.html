@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy policy — Review this!</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.5;
+        max-width: 40rem;
+        margin: 0 auto;
+        padding: 1.5rem;
+        color: #0b0c0c;
+        background: #ffffff;
+      }
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-top: 0;
+      }
+      h2 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        margin: 1.5rem 0 0.5rem;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+      .meta {
+        color: #505a5f;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Privacy policy — Review this! (Design review extension)</h1>
+      <p class="meta">Last updated: 24 April 2026</p>
+
+      <p>
+        This extension adds pins and threaded comments on websites allowed by the permissions you approve at
+        install (apps on <span lang="en">herokuapp.com</span>). This policy explains what
+        information is processed and where it is stored.
+      </p>
+
+      <h2>Data on your device</h2>
+      <p>
+        The extension uses Chrome local storage (<code>chrome.storage.local</code>) to save: your optional
+        profile (display name and email you enter in the product), comments and pin data, and settings needed
+        to show the UI. That data remains on your device unless optional cloud sync is enabled in the build
+        you use.
+      </p>
+
+      <h2>Optional cloud sync</h2>
+      <p>
+        If the publisher ships the extension with a Supabase project configured, the extension sends and
+        loads review data over HTTPS to that project: typically the page identifier (origin, path and query
+        of the URL you are reviewing) and comment threads including the display name shown on each comment.
+        Email from your profile is stored locally for attribution and possible future notifications; it is
+        not uploaded to Supabase in the current version.
+      </p>
+
+      <h2>Who is responsible</h2>
+      <p>
+        The organisation that publishes the extension and operates any configured backend decides retention, access rules, and security for synced data. The extension does not sell
+        personal information and does not include third-party advertising or analytics.
+      </p>
+
+      <h2>Permissions</h2>
+      <p>
+        Host access is limited to the origins declared in the manifest so the content script can run on pages
+        you review. The scripting permission is used only to inject the extension’s own scripts when you use
+        the toolbar action, as described in the store listing.
+      </p>
+
+      <h2>Your choices</h2>
+      <p>
+        You can remove the extension to delete its locally stored data from that browser profile. For data
+        held in a team Supabase project, contact the publisher for access or deletion requests.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        For questions about this policy or your data, email
+        <a href="mailto:khaidinger@gmail.com">khaidinger@gmail.com</a>.
+      </p>
+    </main>
+  </body>
+</html>
