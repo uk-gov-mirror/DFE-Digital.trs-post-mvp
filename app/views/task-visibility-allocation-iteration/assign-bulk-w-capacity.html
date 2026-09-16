@@ -106,6 +106,17 @@
         });
       }
 
+      function getCapacityPercent(user) {
+        var totalWorkload = totalTasks(user);
+        return Math.round((totalWorkload / 10) * 100);
+      }
+
+  /*     function createCapacityBar(user) {
+        var capacity = getCapacityPercent(user);
+        var color = capacity < 30 ? '#2da44c' : capacity < 60 ? '#f0883e' : '#da3633';
+        return '<div class="trs-capacity-bar" style="background-color: ' + color + '; width: ' + capacity + '%"></div>';
+      } */
+
       function createTaskStatusBreakdown(user) {
         return user.taskStatuses.map(function (count, index) {
           if (!count) return '';
@@ -137,7 +148,12 @@
               '<span aria-hidden="true">📌</span>' +
               '<span class=govuk-link govuk-link--no-visited-state>' + getPinLabel(isFav) + '</span>' +
             '</button>' +
-          '</div>' +
+          '</div>' /* +
+          '<div class="trs-capacity-section">' +
+            '<div class="trs-capacity-bar-container">' +
+              createCapacityBar(user) +
+            '</div>' +
+          '</div>' + */ +
           '<details class="govuk-details govuk-!-margin-bottom-3" data-module="govuk-details">' +
             '<summary class="govuk-details__summary">' +
               '<span class="govuk-details__summary-text">' + totalTasks(user) + ' tasks</span>' +
@@ -149,7 +165,23 @@
               createTaskTypeBreakdown(user) +
             '</div>' +
           '</details>' +
+            getCapacityTag(user) +
         '</div>';
+      }
+
+      function getCapacityTag(user) {
+        var capacity = getCapacityPercent(user);
+        var tagClass = '';
+
+        if (capacity < 30) {
+          tagClass = 'govuk-tag--red';
+        } else if (capacity < 60) {
+          tagClass = 'govuk-tag--yellow';
+        } else {
+          tagClass = 'govuk-tag--green';
+        }
+
+        return '<span class="govuk-tag ' + tagClass + '">' + capacity + '% availability</span>';
       }
 
       function renderMyTeamSidebar() {
@@ -159,7 +191,7 @@
         var heading = document.querySelector('#my-team-sidebar .govuk-heading-m');
 
         favs.sort(function (a, b) {
-          return a.name.localeCompare(b.name);
+          return getCapacityPercent(b) - getCapacityPercent(a);
         });
 
         if (!favs.length) {
@@ -175,6 +207,7 @@
           var clone = template.content.cloneNode(true);
           clone.querySelector('[data-member]').setAttribute('data-member', user.id);
           clone.querySelector('[data-user-id]').setAttribute('data-user-id', user.id);
+          clone.querySelector('.sidebar-capacity-tag').innerHTML = getCapacityTag(user);
           clone.querySelector('.sidebar-member-name').textContent = user.name;
           clone.querySelector('.sidebar-task-count').textContent = totalTasks(user) + ' tasks';
           clone.querySelector('.sidebar-status-breakdown').innerHTML = createTaskStatusBreakdown(user);
@@ -352,6 +385,11 @@
 {% block content %}
 
 <style>
+  .trs-autocomplete {
+    position: relative;
+    max-width: 600px;
+  }
+
   .trs-autocomplete__input-wrap {
     position: relative;
   }
@@ -384,9 +422,56 @@
     z-index: 1;
   }
 
+  .trs-ai-suggestions {
+    background: #f0f4f9;
+    border-left: 4px solid #1d70b8;
+    padding: 20px;
+    margin-bottom: 32px;
+  }
+
+  .trs-suggestion-help {
+    color: #505a5f;
+    font-size: 16px;
+  }
+
+  .trs-suggestion-card {
+    display: flex;
+    gap: 16px;
+    background: white;
+    border: 1px solid #b1b4b6;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 2px;
+  }
+
+  .trs-suggestion-rank {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1d70b8;
+    min-width: 40px;
+  }
+
+  .trs-suggestion-content {
+    flex: 1;
+  }
+
+  .trs-suggestion-reason {
+    background: #f3f2f1;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 2px;
+  }
+
+  .trs-suggestion-reason p {
+    margin: 0;
+  }
+
+  .trs-suggestion-select {
+    margin-top: 8px;
+  }
+
   .trs-allocation-summary {
     margin-top: 32px;
-    padding:20px;
   }
 
   .trs-allocation-card {
@@ -396,12 +481,7 @@
   }
 
   .trs-allocation-card--selected {
-    border-left: 5px solid #1d70b8;
-    background-color: #f0f4f9;
-  }
-
-  .trs-allocation-card--favourite.trs-allocation-card--selected {
-    border-left: 5px solid #1d70b8;
+    border-left: 0px solid #1d70b8;
     background-color: #f0f4f9;
   }
 
@@ -439,8 +519,18 @@
   }
 
   .trs-allocation-card--favourite {
-   background-color:none;
-    border-left: 0px solid #1d70b8;
+    /*background-color: #fef8f3;*/
+    /*border-left: 5px solid #d4a574;*/
+  }
+
+  .trs-my-team-section {
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+  }
+
+  .trs-my-team-section .trs-allocation-card {
+    background-color: #fef8f3;
+    /*border-left: 5px solid #d4a574;*/
   }
 
   .trs-my-team-sidebar {
@@ -451,8 +541,7 @@
   .trs-sidebar-card {
     background: #f3f2f1;
     border: 0px solid #b1b4b6;
-    padding: 16px;
-    margin: 16px;
+    padding: 20px;
     border-radius: 2px;
   }
 
@@ -460,10 +549,104 @@
     margin-bottom: 16px;
   }
 
+  .trs-sidebar-member {
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #b1b4b6;
+  }
+
+  .trs-sidebar-member:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  .trs-sidebar-member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .trs-sidebar-member-header p {
+    margin: 0;
+    flex: 1;
+  }
+
+  .trs-sidebar-member-title {
+    flex: 1;
+  }
+
   .trs-favourite-btn--sidebar {
     font-size: 18px;
     flex-shrink: 0;
   }
+
+  .trs-sidebar-capacity {
+    margin-top: 4px;
+    margin-bottom: 8px;
+  }
+
+  .trs-sidebar-breakdown {
+    font-size: 16px;
+    padding-top:8px;
+  }
+
+  .trs-sidebar-breakdown p {
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .trs-sidebar-breakdown .trs-status-badge {
+    font-size: 14px;
+    padding: 4px 8px;
+    margin-bottom: 8px;
+  }
+
+  .govuk-details--small .govuk-details__summary {
+    padding: 6px 0;
+    margin-bottom: 4px;
+  }
+
+  .govuk-details--small .govuk-details__summary-text {
+    font-size: 14px;
+  }
+
+  .govuk-details--small .govuk-details__text {
+    padding: 4px 0 8px 0;
+    margin-bottom: 0;
+  }
+
+  .trs-capacity-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #f3f2f1;
+    border-radius: 2px;
+  }
+
+  .trs-capacity-percent {
+    font-size: 20px;
+    font-weight: bold;
+    color: #0b0c0c;
+    min-width: 45px;
+  }
+
+  .trs-capacity-bar-container {
+    flex: 1;
+    height: 20px;
+    background: #e8e8e8;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .trs-capacity-bar {
+    height: 100%;
+    transition: width 0.2s ease;
+  }
+
 
   .trs-status-badge {
     display: inline-block;
@@ -480,6 +663,16 @@
   .trs-status-2 { background-color: #e6f3e6; } /* Review - green */
   .trs-status-3 { background-color: #fce4e6; } /* On hold - pink */
   .trs-status-4 { background-color: #e0e0e0; } /* Complete - grey */
+
+  .trs-allocation-card__breakdown {
+    border-left: 4px solid #b1b4b6;
+    padding: 14px 25px;
+    margin-top: 8px;
+  }
+
+  .trs-allocation-card__breakdown p {
+    margin-bottom: 0;
+  }
 
   .trs-user-assignment-bar {
     position: fixed;
@@ -613,6 +806,9 @@
           <div class="sidebar-task-type-breakdown"></div>
         </div>
       </details>
+      <span class="sidebar-capacity-tag "></span> 
+
+      
     </div>
   </template>
 
